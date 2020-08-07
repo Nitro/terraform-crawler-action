@@ -10,6 +10,9 @@ inputs:
     description: 'the name of the module to search for'
     required: true
     default: 'dummy'
+outputs:
+  target_folders:
+    description: 'The folders where we a going to run terraform'
 runs:
   using: 'docker'
   image: 'Dockerfile'

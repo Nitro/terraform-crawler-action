@@ -69,4 +69,4 @@ def findModuleUsage(currentFolder, moduleRelativePath):
         listEnvironments.append(crawlUpFolders(moduleUsagePath,""))
     return listEnvironments
 
-print(findModuleUsage(sys.argv[1],sys.argv[2]))
+print("::set-output name={}::{}".format("target_folders",findModuleUsage(sys.argv[1],sys.argv[2])))
