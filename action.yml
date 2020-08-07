@@ -1,0 +1,18 @@
+# action.yml
+name: 'Terraform Crawler'
+description: 'Find usage of a module'
+inputs:
+  folder:
+    description: 'the folder in which the module is located'
+    required: true
+    default: 'dummy'
+  module:
+    description: 'the name of the module to search for'
+    required: true
+    default: 'dummy'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.folder }}
+    - ${{ inputs.module }}

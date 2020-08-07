@@ -1,24 +1,8 @@
 import os
-import hcl
-import re
+import sys
 
-filePath = "/Users/dhaven/Nitro-repos/infracode/terraform/modules/service/grafana/main.tf"
-backendS3FileName = "backend_s3.tf"
-rootFolder = "terraform"
-
-#with(open('/Users/dhaven/Nitro-repos/infracode/terraform/environments/staging/kubernetes/main.tf', 'r')) as file:
-#    content = file.readlines()
-#    for line in content:
-#        if '../../../modules/kubernetes/config_map' in line:
-#            print("pattern found")
-
-moduleDirPath = os.path.dirname(filePath)
-moduleDir = os.path.basename(os.path.dirname(filePath))
-#print(moduleDir)
-backendS3Found = False
-parentDir = os.path.dirname(moduleDirPath)
-#print(os.listdir(parentDir))
-#print(parentDir)
+backendS3FileName = "backend_s3.tf" # this file is always located at the root of a terraform folder
+rootFolder = "terraform" # this is the root of all terraform files
 
 
 # does a "reverse" breadth first search starting from "currentDir"
@@ -47,21 +31,13 @@ def crawlDownFolders(currentDir, ignoreDir):
                 return crawlDownFolders(folderPath,"")
         return None
 
-
-
-
-
 def crawlUpFolders2(currentDir, ignoreDir, moduleRelativePath, runningList = None):
-    #print("currentDir is {}".format(currentDir))
-    #print("ignoreDir is {}".format(ignoreDir))
-    #print("runningList is {}".format(runningList))
     if runningList is None:
         runningList = []
     if(os.path.basename(currentDir) == rootFolder):
         return runningList + crawlDownFolders2(currentDir, ignoreDir, moduleRelativePath)
     else:
         subList = crawlDownFolders2(currentDir, ignoreDir, moduleRelativePath)
-        #print("found list {}".format(subList))
         return crawlUpFolders2(os.path.dirname(currentDir),os.path.basename(currentDir),os.path.join(os.path.basename(currentDir),moduleRelativePath),runningList + subList)
 
 
@@ -93,8 +69,4 @@ def findModuleUsage(currentFolder, moduleRelativePath):
         listEnvironments.append(crawlUpFolders(moduleUsagePath,""))
     return listEnvironments
 
-print(findModuleUsage("/Users/dhaven/Nitro-repos/infracode/terraform/modules","eks"))
-#print(crawlUpFolders('/Users/dhaven/Nitro-repos/infracode/terraform/environments/production/eks',""))
-#print(crawlUpFolders2("/Users/dhaven/Nitro-repos/infracode/terraform/modules","","eks"))
-#findModuleUsage("/Users/dhaven/Nitro-repos/infracode/terraform/modules/service/grafana",".")
-#print(crawlDownFolders2("/Users/dhaven/Nitro-repos/infracode/terraform/environments","","modules/service/grafana"))
+print(findModuleUsage(sys.argv[1],sys.argv[2]))
