@@ -7,7 +7,6 @@ import json
 # "listFiles" is the list of files on which the search will be performed. They are represented
 # as a path starting from the root of the repo (ex: firstfolder/secondfolder/myfile.tf)
 # "targetFile" is a key file which indicates the location from which terraform commands should be applied
-#
 class TerraformCrawler:
     def __init__(self, repoPath, listFiles, targetFile):
         self.repoPath = repoPath
