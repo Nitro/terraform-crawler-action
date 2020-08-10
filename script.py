@@ -2,8 +2,6 @@ import os
 import sys
 import json
 
-rootFolder = "terraform" # this is the root of all terraform files
-
 # A class that represent a crawler used to find usage of modules in Terraform
 # "repoPath" is the full path to the root of the repo. All search happens within the repo
 # "listFiles" is the list of files on which the search will be performed. They are represented
