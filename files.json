@@ -1,0 +1,6 @@
+[
+    "terraform/environments/production/dns.tf",
+    "terraform/modules/eks/variables.tf",
+    "terraform/modules/vpc/gateway/main.tf",
+    "terraform/users/users.tf"
+]

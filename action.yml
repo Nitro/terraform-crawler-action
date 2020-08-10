@@ -2,14 +2,10 @@
 name: 'Terraform Crawler'
 description: 'Find usage of a module'
 inputs:
-  folder:
-    description: 'the folder in which the module is located'
+  filepath:
+    description: 'the path to the json file that contains the list of modified files'
     required: true
-    default: 'dummy'
-  module:
-    description: 'the name of the module to search for'
-    required: true
-    default: 'dummy'
+    default: 'dummy.json'
 outputs:
   target_folders:
     description: 'The folders where we a going to run terraform'
@@ -17,5 +13,4 @@ runs:
   using: 'docker'
   image: 'Dockerfile'
   args:
-    - ${{ inputs.folder }}
-    - ${{ inputs.module }}
+    - ${{ inputs.filepath }}
