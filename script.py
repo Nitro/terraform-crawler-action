@@ -29,24 +29,18 @@ class TerraformCrawler:
     # if there is a chain of module imports (i.e. X -> Y import X -> Z import Y)
     # Then this function with return the file that does the last import
     def findModuleUsage(self, filePath):
-        #print("looking for places where {} is called from".format(filePath))
         parentDirPath = os.path.dirname(filePath) # path to parent folder starting from root of repo
         parentFullPath = os.path.join(self.repoPath,parentDirPath) # full path to parent folder
-        #print("first candidate is {}".format(parentFullPath))
         listCandidateModules = [parentFullPath]
         listRootFolders = []
-        # 1. Recursively search for calling modules. (find calling module, check if isRootModule returns true, if not loop)
         while listCandidateModules:
-            #print("candidate modules are {}".format(listCandidateModules))
             parentDirPath = listCandidateModules.pop()
             if self.isRootModule(parentDirPath):
-                #print("found that {} is a root folder".format(parentDirPath))
                 listRootFolders.append(parentDirPath)
             else:
                 moduleName = os.path.basename(parentDirPath) # the name of the module we are looking for
                 parentDirPath = os.path.dirname(parentDirPath)
                 parentFullPath = os.path.join(self.repoPath,parentDirPath)
-                #print("module name is {}".format(moduleName))
                 listCandidateModules += self.findCallingModule(parentFullPath,'',moduleName)
         return listRootFolders
 
@@ -74,7 +68,6 @@ class TerraformCrawler:
                 with(open(filePath, 'r')) as file:
                     for line in file.readlines():
                         if moduleRelativePath in line:
-                            #print("found an occurence of {} in {}".format(moduleRelativePath,filePath))
                             return [currentDir]
         newList = []
         for folder in os.listdir(currentDir):
