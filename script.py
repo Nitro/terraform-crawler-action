@@ -85,17 +85,16 @@ class TerraformCrawler:
         return newList
 
 def main():
-    filename = sys.argv[1]
-    with open(filename) as f:
-      data = json.load(f)
-      crawler = TerraformCrawler(os.environ['GITHUB_WORKSPACE'],data,'backend_s3.tf')
-      listTerraformFolders = []
-      for value in crawler.listFiles:
-          nextListFolders = crawler.findModuleUsage(value)
-          for folder in nextListFolders:
-              if not folder in listTerraformFolders:
-                  listTerraformFolders.append(folder)
-      print("::set-output name={}::{}".format("target_folders",listTerraformFolders))
+    jsonString = sys.argv[1]
+    data = json.loads(jsonString)
+    crawler = TerraformCrawler(os.environ['GITHUB_WORKSPACE'],data,'backend_s3.tf')
+    listTerraformFolders = []
+    for value in crawler.listFiles:
+        nextListFolders = crawler.findModuleUsage(value)
+        for folder in nextListFolders:
+            if not folder in listTerraformFolders:
+                listTerraformFolders.append(folder)
+    print("::set-output name={}::{}".format("target_folders",listTerraformFolders))
 
 if __name__ == "__main__":
     main()

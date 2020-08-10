@@ -2,10 +2,10 @@
 name: 'Terraform Crawler'
 description: 'Find usage of a module'
 inputs:
-  filepath:
-    description: 'the path to the json file that contains the list of modified files'
+  changedFilesList:
+    description: 'A json encoded list of modified files'
     required: true
-    default: 'dummy.json'
+    default: '[]'
 outputs:
   target_folders:
     description: 'The folders where we a going to run terraform'
