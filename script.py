@@ -25,7 +25,7 @@ class TerraformCrawler:
                 return True
         return False
 
-    # returns a list of files that are importing the module "moduleFolderPath"
+    # returns a list of files that are importing the module "filePath"
     # if there is a chain of module imports (i.e. X -> Y import X -> Z import Y)
     # Then this function with return the file that does the last import
     def findModuleUsage(self, filePath):
@@ -36,7 +36,7 @@ class TerraformCrawler:
         while listCandidateModules:
             parentDirPath = listCandidateModules.pop()
             if self.isRootModule(parentDirPath):
-                listRootFolders.append(parentDirPath)
+                listRootFolders.append(parentDirPath.replace(self.repoPath + "/", ''))
             else:
                 moduleName = os.path.basename(parentDirPath) # the name of the module we are looking for
                 parentDirPath = os.path.dirname(parentDirPath)
