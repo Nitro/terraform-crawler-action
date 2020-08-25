@@ -86,7 +86,7 @@ def main():
         for folder in nextListFolders:
             if not folder in listTerraformFolders:
                 listTerraformFolders.append(folder)
-    print("::set-output name={}::{}".format("target_folders",listTerraformFolders))
+    print("::set-output name={}::{}".format("target_folders",json.dumps(listTerraformFolders)))
 
 if __name__ == "__main__":
     main()
