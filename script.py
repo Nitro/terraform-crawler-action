@@ -19,11 +19,17 @@ class TerraformCrawler:
     # a terraform command should be applied from here
     # and false otherwise
     def isRootModule(self, dirPath):
-        for file in os.listdir(dirPath):
-            filePath = os.path.join(dirPath,file)
-            if os.path.isfile(filePath) and os.path.basename(filePath) == self.targetFile:
-                return True
-        return False
+        try:
+            filesInDir = os.listdir(dirPath)
+            for file in filesInDir:
+                filePath = os.path.join(dirPath,file)
+                if os.path.isfile(filePath) and os.path.basename(filePath) == self.targetFile:
+                    return True
+            return False
+        except FileNotFoundError:
+            # error is generated if the parent folder doesn't exist anymore (file and folder were deleted)
+            # return false because we are certain this isn't a root module
+            return False
 
     # returns a list of files that are importing the module "filePath"
     # if there is a chain of module imports (i.e. X -> Y import X -> Z import Y)
@@ -62,19 +68,24 @@ class TerraformCrawler:
     # crawls down a folder looking for usage of "moduleRelativePath"
     # returns the list of all folders calling "moduleRelativePath" within "currentDir"
     def findCallingModuleHelper(self, currentDir, ignoreDir, moduleRelativePath):
-        for file in os.listdir(currentDir):
-            filePath = os.path.join(currentDir,file)
-            if os.path.isfile(filePath) and file.endswith(".tf"):
-                with(open(filePath, 'r')) as file:
-                    for line in file.readlines():
-                        if moduleRelativePath in line:
-                            return [currentDir]
-        newList = []
-        for folder in os.listdir(currentDir):
-            folderPath = os.path.join(currentDir,folder)
-            if os.path.isdir(folderPath) and (os.path.basename(folderPath) != ignoreDir) and not os.path.basename(folderPath).startswith('.'):
-                newList = newList + self.findCallingModuleHelper(folderPath,"", "../" + moduleRelativePath)
-        return newList
+        try:
+            filesInDir = os.listdir(currentDir)
+            for file in filesInDir:
+                filePath = os.path.join(currentDir,file)
+                if os.path.isfile(filePath) and file.endswith(".tf"):
+                    with(open(filePath, 'r')) as file:
+                        for line in file.readlines():
+                            if moduleRelativePath in line:
+                                return [currentDir]
+            newList = []
+            for folder in os.listdir(currentDir):
+                folderPath = os.path.join(currentDir,folder)
+                if os.path.isdir(folderPath) and (os.path.basename(folderPath) != ignoreDir) and not os.path.basename(folderPath).startswith('.'):
+                    newList = newList + self.findCallingModuleHelper(folderPath,"", "../" + moduleRelativePath)
+            return newList
+        except FileNotFoundError:
+            # if the folder doesn't exist there is no need to crawl down inside it
+            return []
 
 def main():
     jsonString = sys.argv[1]
