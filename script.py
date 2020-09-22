@@ -1,17 +1,16 @@
 import os
 import sys
 import json
+import re
 
 # A class that represent a crawler used to find usage of modules in Terraform
 # "repoPath" is the full path to the root of the repo. All search happens within the repo
 # "listFiles" is the list of files on which the search will be performed. They are represented
 # as a path starting from the root of the repo (ex: firstfolder/secondfolder/myfile.tf)
-# "targetFile" is a key file which indicates the location from which terraform commands should be applied
 class TerraformCrawler:
-    def __init__(self, repoPath, listFiles, targetFile):
+    def __init__(self, repoPath, listFiles):
         self.repoPath = repoPath
         self.listFiles = listFiles
-        self.targetFile = targetFile
         self.rootFolder = os.path.basename(self.repoPath)
 
 
@@ -23,8 +22,11 @@ class TerraformCrawler:
             filesInDir = os.listdir(dirPath)
             for file in filesInDir:
                 filePath = os.path.join(dirPath,file)
-                if os.path.isfile(filePath) and os.path.basename(filePath) == self.targetFile:
-                    return True
+                if os.path.isfile(filePath) and file.endswith(".tf"):
+                    with(open(filePath, 'r')) as file:
+                        for line in file.readlines():
+                            if re.match(r"provider \".*\" {",line) or re.match("terraform {",line):
+                                return True
             return False
         except FileNotFoundError:
             # error is generated if the parent folder doesn't exist anymore (file and folder were deleted)
@@ -90,7 +92,7 @@ class TerraformCrawler:
 def main():
     jsonString = sys.argv[1]
     data = json.loads(jsonString)
-    crawler = TerraformCrawler(os.environ['GITHUB_WORKSPACE'],data,'backend_s3.tf')
+    crawler = TerraformCrawler(os.environ['GITHUB_WORKSPACE'],data)
     listTerraformFolders = []
     for value in crawler.listFiles:
         nextListFolders = crawler.findModuleUsage(value)
